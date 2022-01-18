@@ -12,10 +12,11 @@ waste_sorted = "Raccolta differenziata"
 waste_ratio = "Rapporto differenziata/non differenziata"
 mean = "Sopra/Sotto la media"
 
-dataFrame = pandas.read_csv('data.csv')
-
-features = [population, income, business]
 target = waste
+
+dataFrame = pandas.read_csv('data.csv')
+features = [population, income, business]
+
 meanTarget = dataFrame[target].mean()
 
 dataFrame[mean] = dataFrame.apply(lambda row: ('Sotto' if row[target] < meanTarget else 'Sopra'), axis=1)
@@ -37,17 +38,20 @@ fig = plt.figure(figsize = (8,8))
 ax = fig.add_subplot(1,1,1) 
 ax.set_xlabel(f'PC 1 ({round(variance_ratio[0]*100), 1}%)', fontsize = 15)
 ax.set_ylabel(f'PC 2 ({round(variance_ratio[1]*100, 1)}%)', fontsize = 15)
-ax.set_title('2 component PCA', fontsize = 20)
+
+title = f"Media di {target.lower()}\nComponenti iniziali:"
+for component in features:
+    title = title + f" {component.lower()}"
+ax.set_title(title, fontsize = 20)
 
 targets = ['Sopra', 'Sotto']
 colors = ['r', 'g']
-for target, color in zip(targets,colors):
-    indicesToKeep = finalDf[mean] == target
+for target_graph, color in zip(targets,colors):
+    indicesToKeep = finalDf[mean] == target_graph
     ax.scatter(finalDf.loc[indicesToKeep, 'Principal component 1']
                , finalDf.loc[indicesToKeep, 'Principal component 2']
                , c = color
                , s = 50)
 ax.legend(targets)
 ax.grid()
-
-plt.show()
+plt.savefig(f"PCA {target.lower()}.png")
